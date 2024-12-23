@@ -132,3 +132,6 @@ class Visualization(object):
             # self.viewer.gaussian(track.mean[:2], track.covariance[:2, :2],
             #                      label="%d" % track.track_id)
 #
+
+    def save_png(self, path):
+        self.viewer.save(path)

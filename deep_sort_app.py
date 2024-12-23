@@ -126,7 +126,7 @@ def create_detections(detection_mat, frame_idx, min_height=0):
     return detection_list
 
 
-def run(sequence_dir, detection_file, output_file, min_confidence,
+def run(sequence_dir, detection_file, output_file, save_png, min_confidence,
         nms_max_overlap, min_detection_height, max_cosine_distance,
         nn_budget, display):
     """Run multi-target tracker on a particular sequence.
@@ -140,6 +140,9 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
     output_file : str
         Path to the tracking output file. This file will contain the tracking
         results on completion.
+    save_png : str
+        Path to the output folder. This folder will contain the
+        intermediate tracking results in PNG format.
     min_confidence : float
         Detection confidence threshold. Disregard all detections that have
         a confidence lower than this value.
@@ -189,8 +192,14 @@ def run(sequence_dir, detection_file, output_file, min_confidence,
             vis.set_image(image.copy())
             vis.draw_detections(detections)
             vis.draw_trackers(tracker.tracks)
+            if save_png is not None:
+                input_img_path = seq_info["image_filenames"][frame_idx]
+                _, file_name = os.path.split(input_img_path)
+                file_name_noext, _ = os.path.splitext(file_name)
+                output_img_path = "{}/{}_intermediate.png".format(save_png, file_name_noext)
+                vis.save_png(output_img_path)
 
-        # Store results.
+                # Store results.
         for track in tracker.tracks:
             if not track.is_confirmed() or track.time_since_update > 1:
                 continue
@@ -233,6 +242,10 @@ def parse_args():
         " contain the tracking results on completion.",
         default="/tmp/hypotheses.txt")
     parser.add_argument(
+        "--save_png", help="Path to the output folder. This folder will"
+        " contain the intermediate tracking results in PNG format.",
+        default=None, type=str)
+    parser.add_argument(
         "--min_confidence", help="Detection confidence threshold. Disregard "
         "all detections that have a confidence lower than this value.",
         default=0.8, type=float)
@@ -258,6 +271,6 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     run(
-        args.sequence_dir, args.detection_file, args.output_file,
+        args.sequence_dir, args.detection_file, args.output_file, args.save_png,
         args.min_confidence, args.nms_max_overlap, args.min_detection_height,
         args.max_cosine_distance, args.nn_budget, args.display)

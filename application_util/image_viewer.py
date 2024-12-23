@@ -343,3 +343,17 @@ class ImageViewer(object):
 
         """
         self._terminate = True
+
+    def save(self, path):
+        """Saves image as PNG.
+
+        Parameters
+        ----------
+        path : str
+            Image path
+
+        """
+        try:
+            cv2.imwrite(path, self.image)
+        except Exception as e:
+            print(f"Error on image saving: {e}")
