@@ -52,7 +52,7 @@ def run(sequence_dir, result_file, show_false_alarms=False, detection_file=None,
                 seq_info["detections"], frame_idx)
             vis.draw_detections(detections)
 
-        mask = results[:, 0].astype(np.int) == frame_idx
+        mask = results[:, 0].astype(np.int32) == frame_idx
         track_ids = results[mask, 1].astype(np.int)
         boxes = results[mask, 2:6]
         vis.draw_groundtruth(track_ids, boxes)
